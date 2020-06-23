@@ -82,3 +82,85 @@ class Trie{
     return 1
   }
 }
+
+class charachterGrid{
+  var charMatrix: [[String]]
+  var visited: [[Bool]]
+  var currentString: String
+  var myTrie: Trie
+  var width: Int
+  var height: Int
+  var resultList: [String]
+
+  init(_ width: Int,_ height: Int,_ trie: Trie,_ matrix: [[String]]){
+    self.width = width
+    self.height = height
+    self.charMatrix = matrix
+    self.visited = Array(repeating: Array<Bool>(repeating: false, count: self.height),count: self.width)
+    self.myTrie = trie
+    self.currentString = ""
+    self.resultList = [String]()
+  }
+
+  func search(_ row: Int,_ col: Int){
+    let result: Int = myTrie.find(currentString)
+
+    if result != 0{
+      if result == 2 && !self.resultList.contains(currentString){
+          resultList.append(currentString)
+      }
+      for r in (row-1)...(row+1){
+        for c in (col-1)...(col+1){
+          if r >= 0 && r < self.width && c >= 0 && c < self.height && visited[r][c] == false{
+            visited[r][c] = true
+            currentString.append(charMatrix[r][c])
+            search(r, c)
+            currentString.remove(at: currentString.index(before: currentString.endIndex))
+            visited[r][c] = false
+          }
+        }
+      }
+    }
+  }
+
+  func traverseGrid(){
+    for r in 0..<self.width{
+      currentString = ""
+      for c in 0..<self.height{
+        visited[r][c] = true
+        currentString.append(charMatrix[r][c])
+        search(r, c)
+        currentString.remove(at: currentString.index(before: currentString.endIndex))
+        visited[r][c] = false
+      }
+    }
+  }
+
+}
+
+var trie = Trie()
+
+let words = readLine()!.components(separatedBy: " ")
+let widthnHight = readLine()!.components(separatedBy: " ")
+let x = Int(widthnHight[0])!
+let y = Int(widthnHight[1])!
+
+for word in words{
+  trie.insert(word)
+}
+
+var matrix: [[String]] = Array(repeating: Array<String>(repeating: "",count: y), count: x)
+for i in 0..<x{
+  let row = readLine()!.components(separatedBy: " ")
+  for j in 0..<y{
+    matrix[i][j] = row[j]
+  }
+}
+
+let charGrid = charachterGrid(x, y, trie, matrix)
+charGrid.traverseGrid()
+if !charGrid.resultList.isEmpty{
+  for x in charGrid.resultList{
+    print(x)
+  }
+}
